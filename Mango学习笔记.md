@@ -202,6 +202,15 @@ git log
 git reset --hard 版本号
 ```
 
+其他命令
+
+```
+# 把本地所有untrack的文件都加入暂存区，并且会根据.gitignore做过滤
+git add .
+# 把本地所有untrack的文件都加入暂存区，会忽略.gitignore
+git add *
+```
+
 查看本地库状态
 
 ![image-20220413215152727](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220413215152727.png)
@@ -692,4 +701,6 @@ ll
 Linux默认安装库的位置；头文件的位置
 
 
+
+#### 30Day自制OS
 
