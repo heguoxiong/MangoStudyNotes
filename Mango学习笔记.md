@@ -425,6 +425,8 @@ p
 
 #### Linux命令
 
+基本命令
+
 ```
 # 查看文件中的内容
 cat hello.txt
@@ -432,6 +434,50 @@ cat hello.txt
 tail -n 1 hello.txt
 # 查看目录下各文件信息
 ll
+```
+
+查看安装库的命令
+
+```
+# 查看安装的opencv版本
+pkg-config opencv --modversion
+=="3.4.16"
+# 方法一：查看opencv安装库的位置
+pkg-config opencv --libs
+=="/user/local/lib/"
+# opencv安装后头文件的位置
+=="/user/local/include/"
+
+# 方法二：查看opencv安装路径
+# 搜索带有关键字opencv的所有文件及文件夹都会输出到终端
+sudo find / -iname "*opencv*"
+# 搜索带有关键字opencv的所有文件及文件夹输出到txt文件
+sudo find / -iname "*opencv*" > /home/mango/Desktop/opencv_find.txt
+
+# pcl1.12安装库路径
+/user/lib/
+# pcl头文件路径
+/user/include
+```
+
+#### Windows命令
+
+```
+# 如果你要删除的整个文件夹以及文件夹里面的所有内容的话
+rd/s/q 盘符:某个文件夹 （这样整个文件夹所有的文件和文件夹都删除了）
+# 比如我想删除D盘的123文件夹以及123文件夹里面所有的内容
+rd/s/q d:123 这样就删除了
+
+# 如果只是单独删除某个文件的话用
+del/f/s/q 盘符:文件名
+# 比如我想删除D盘的456文件夹里面的789这个记事本文件
+del/f/s/q d:456789.txt
+删除文件的话记住要加上它的后缀名
+
+# 删除当前目录下的所有文件
+del *
+y
+
 ```
 
 
@@ -695,6 +741,13 @@ ll
    设置代码编辑按行自动格式化：文件->首选项->设置    进入后打开Editor:Format on Type
 
    ![image-20220419181137306](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220419181137306.png)
+   
+   1. 打开vscode --> 设置 --> setting.json 
+   在setting.json中添加以下三行代码：
+   "editor.formatOnType": true,
+   "editor.formatOnSave": true,
+   "editor.formatOnPaste": true // 自动格式化粘贴的内容
+   2. 或者，打开vscode --> 设置 --> 搜索"格式化" --> 点击"文本编辑器" --> "正在格式化" --> 勾选里面的三个选项
 
 #### cmake(黑马程序员make)
 
@@ -703,4 +756,21 @@ Linux默认安装库的位置；头文件的位置
 
 
 #### 30Day自制OS
+
+
+
+#### 剑指Offer
+
+##### STL
+
+unordered_map插入元素的区别：
+
+![image-20220420112420236](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220420112420236.png)
+
+unordered_map取出value：
+
+```
+unordered_map<char,int>::itrator it = mmap.find(c);
+int val = it->second;
+```
 
