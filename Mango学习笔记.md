@@ -4,7 +4,9 @@
 
 <img src="https://pic2.zhimg.com/v2-632a3a08c0f30f0abcdb8b06afbe346d_b.jpg" alt="img"  />
 
-#### YOLO
+![image-20220421161620810](TyporaImg/image-20220421161620810.png)
+
+#### YOLOV5
 
 1. 环境配置
 
@@ -438,15 +440,15 @@ ll
 
 查看安装库的命令
 
-```
+```shell
 # 查看安装的opencv版本
-pkg-config opencv --modversion
+pkg-config --modversion opencv
 =="3.4.16"
 # 方法一：查看opencv安装库的位置
-pkg-config opencv --libs
-=="/user/local/lib/"
+pkg-config --libs opencv
+=="/usr/local/lib/"
 # opencv安装后头文件的位置
-=="/user/local/include/"
+=="/usr/local/include/"
 
 # 方法二：查看opencv安装路径
 # 搜索带有关键字opencv的所有文件及文件夹都会输出到终端
@@ -455,10 +457,31 @@ sudo find / -iname "*opencv*"
 sudo find / -iname "*opencv*" > /home/mango/Desktop/opencv_find.txt
 
 # pcl1.12安装库路径
-/user/lib/
+/usr/lib/
 # pcl头文件路径
-/user/include
+/usr/include
 ```
+
+ldconfig：动态链接库管理命令
+
+**ldconfig命令** 的用途主要是在默认搜寻目录`/lib`和`/usr/lib`以及动态库配置文件`/etc/ld.so.conf`内所列的目录下，搜索出可共享的动态链接库（格式如lib*.so*）,进而创建出动态装入程序(ld.so)所需的连接和缓存文件。缓存文件默认为`/etc/ld.so.cache`，此文件保存已排好序的动态链接库名字列表，为了让动态链接库为系统所共享，需运行动态链接库的管理命令ldconfig，此执行程序存放在`/sbin`目录下。
+
+ldconfig通常在系统启动时运行，而当用户安装了一个新的动态链接库时，就需要手工运行这个命令。
+
+```
+# 语法
+ldconfig [-v|--verbose] [-n] [-N] [-X] [-f CONF] [-C CACHE] [-r ROOT] [-l] [-p|--print-cache] [-c FORMAT] [--format=FORMAT] [-V] -?|--[help|--usage] path...
+```
+
+**ldconfig几个需要注意的地方：**
+
+1. 往`/lib`和`/usr/lib`里面加东西，是不用修改`/etc/ld.so.conf`的，但是完了之后要调一下ldconfig，不然这个library会找不到。
+2. 想往上面两个目录以外加东西的时候，一定要修改`/etc/ld.so.conf`，然后再调用ldconfig，不然也会找不到。
+3. **比如安装了一个mysql到`/usr/local/mysql`，mysql有一大堆library在`/usr/local/mysql/lib`下面，这时就需要在`/etc/ld.so.conf`下面加一行`/usr/local/mysql/lib`，保存过后ldconfig一下，新的library才能在程序运行时被找到**。
+4. 如果想在这两个目录以外放lib，但是又不想在`/etc/ld.so.conf`中加东西（或者是没有权限加东西）。那也可以，就是export一个全局变量LD_LIBRARY_PATH，然后运行程序的时候就会去这个目录中找library。一般来讲这只是一种临时的解决方案，在没有权限或临时需要的时候使用。
+5. ldconfig做的这些东西都与运行程序时有关，跟编译时一点关系都没有。编译的时候还是该加-L就得加，不要混淆了。
+6. 总之，就是不管做了什么关于library的变动后，最好都ldconfig一下，不然会出现一些意想不到的结果。不会花太多的时间，但是会省很多的事。
+7. 再有，诸如libdb-4.3.so文件头中是会含有库名相关的信息的（即含“libdb-4.3.so”，可用strings命令察看），因此 仅通过修改文件名以冒充某已被识别的库（如libdb-4.8.so）是行不通的。为此可在编译库的Makefile中直接修改配置信息，指定特别的库名。
 
 #### Windows命令
 
@@ -508,7 +531,7 @@ y
 
      - 基于g++的命令
 
-       ```
+       ```shell
        # 使用g++编译cpp文件，生成a.exe可执行文件
        g++ main.cpp
        # 生成可调试为文件(-g)；同时指定可执行文件名称为"myname.exe"(-o)
@@ -757,7 +780,103 @@ Linux默认安装库的位置；头文件的位置
 
 #### 30Day自制OS
 
+#### SLAM14讲
 
+##### ch2
+
+编译环境配置
+
+![image-20220420162447539](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220420162447539.png)
+
+cmake调用动态库
+
+![image-20220420162947135](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220420162947135.png)
+
+![image-20220420163744915](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220420163744915.png)
+
+调用静态库：将链接库名改为静态库名即可！
+
+![image-20220420164424610](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220420164424610.png)
+
+##### ch3
+
+1. 用到的第三方库
+
+   - Eigen
+
+     Eigen是一个高层次的C ++库，有效支持线性代数，矩阵和矢量运算，数值分析及其相关的算法。Eigen是一个开源库，从3.1.1版本开始遵从MPL2许可。
+
+   - Pangolin
+
+     Pangolin 是一组轻量级和可移植的实用程序库，用于制作基于 3D、数字或视频的程序和算法的原型。 它在计算机视觉领域被广泛使用，作为删除特定于平台的样板并使数据可视化变得容易的一种手段。
+
+     Pangolin 的总体精神是通过简单的界面和工厂，而不是窗口和视频，最大限度地减少样板文件并最大限度地提高可移植性和灵活性。 它还提供了一套用于交互式调试的实用程序，例如 3D 操作、绘图仪、调整变量，以及用于 python 脚本和实时调整的下拉式类似 Quake 的控制台。
+
+     ```
+     # 安装Pangolin库
+     # install dependency for pangolin (mainly the OpenGL)
+     sudo apt-get install libglew-dev
+     # 下载库文件
+     git clone https://github.com/stevenlovegrove/Pangolin.git
+     # 编译Pangolin
+     mkdir build
+     cd build
+     cmake ..
+     make 
+     # 安装库文件
+     sudo make install 
+     sudo ldconfig  # 关于此条命令，见linux命令章节。目的是为了让系统能够找到Pangolin库
+     ```
+
+     
+
+2. 编译环境介绍
+
+3. 旋转矩阵
+
+   1. 向量内积、外积
+
+      内积
+
+      ![image-20220421154529877](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421154529877.png)
+
+      **外积**
+
+      ![image-20220421154639222](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421154639222.png)
+
+      外积的性质
+
+      ![image-20220421154950598](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421154950598.png)
+
+      ![image-20220421154929971](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421154929971.png)
+
+   2. 坐标系间的欧式变换
+
+      ![image-20220421155456189](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421155456189.png)
+
+      旋转矩阵
+
+      ![image-20220421155617021](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421155617021.png)
+
+      旋转矩阵的性质：行列式为1的正交矩阵。
+
+      ![image-20220421155724117](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421155724117.png)
+
+      ![image-20220421155814849](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421155814849.png)
+
+      旋转+平移
+
+      ![image-20220421155852679](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421155852679.png)
+
+   3. 变换矩阵与齐次坐标
+
+      ![image-20220421160749135](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421160749135.png)
+
+      三维向量的齐次坐标变为四维。
+
+      ![image-20220421160947904](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421160947904.png)
+
+4. 
 
 #### 剑指Offer
 
