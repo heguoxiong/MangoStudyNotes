@@ -4,8 +4,6 @@
 
 <img src="https://pic2.zhimg.com/v2-632a3a08c0f30f0abcdb8b06afbe346d_b.jpg" alt="img"  />
 
-![image-20220421161620810](TyporaImg/image-20220421161620810.png)
-
 #### YOLOV5
 
 1. 环境配置
@@ -429,13 +427,17 @@ p
 
 基本命令
 
-```
+```shell
 # 查看文件中的内容
 cat hello.txt
 # 查看文件中最后一行的内容
 tail -n 1 hello.txt
 # 查看目录下各文件信息
 ll
+# 切换到root用户
+sudo -s
+# 退出root用户
+exit
 ```
 
 查看安装库的命令
@@ -804,7 +806,19 @@ cmake调用动态库
 
    - Eigen
 
-     Eigen是一个高层次的C ++库，有效支持线性代数，矩阵和矢量运算，数值分析及其相关的算法。Eigen是一个开源库，从3.1.1版本开始遵从MPL2许可。
+     Eigen是一个 C++ 开源线性代数库。它提供了有效支持线性代数，矩阵和矢量运算，数值分析及其相关的算法，还包括解方程等功能。许多上层的软件库也使用Eigen进行矩阵运算，包括 g2o、Sophus 等。
+
+     Eigen特殊之处在于，它是一个纯用头文件搭建起来的库。这意味着你只能找到它的头文件，而没有.so 或.a 那样的二进制文件。我们在使用时，**只需引入Eigen的头文件**即可，不需要链接它的库文件（因为它没有库文件）。
+
+     ```shell
+     # 安装Eigen库
+     sudo apt-get install libeigen3-dev
+     # Eigen 头文件的默认位置在“/usr/include/eigen3/” 中。如果你不确定，可以输入
+     sudo updatedb # centos环境下，需要安装yum
+     locate eigen3 # centos环境下
+     ```
+
+     
 
    - Pangolin
 
@@ -812,7 +826,7 @@ cmake调用动态库
 
      Pangolin 的总体精神是通过简单的界面和工厂，而不是窗口和视频，最大限度地减少样板文件并最大限度地提高可移植性和灵活性。 它还提供了一套用于交互式调试的实用程序，例如 3D 操作、绘图仪、调整变量，以及用于 python 脚本和实时调整的下拉式类似 Quake 的控制台。
 
-     ```
+     ```shell
      # 安装Pangolin库
      # install dependency for pangolin (mainly the OpenGL)
      sudo apt-get install libglew-dev
@@ -828,11 +842,7 @@ cmake调用动态库
      sudo ldconfig  # 关于此条命令，见linux命令章节。目的是为了让系统能够找到Pangolin库
      ```
 
-     
-
-2. 编译环境介绍
-
-3. 旋转矩阵
+2. 旋转矩阵
 
    1. 向量内积、外积
 
@@ -876,7 +886,232 @@ cmake调用动态库
 
       ![image-20220421160947904](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220421160947904.png)
 
-4. 
+3. useEigen项目介绍
+
+   <img src="TyporaImg/image-20220421164805087.png" alt="image-20220421164805087" style="zoom:50%;" />
+
+   矩阵相关知识
+
+   ![image-20220421170144243](TyporaImg/image-20220421170144243.png)
+
+   重要的矩阵计算
+
+   ![image-20220421170515066](TyporaImg/image-20220421170515066.png)
+
+   矩阵解方程
+
+   ![image-20220421171034699](TyporaImg/image-20220421171034699.png)
+
+4. 旋转向量和欧拉角
+
+   为什么有了旋转矩阵和变换矩阵，还要继续研究旋转向量？
+
+   ![image-20220421171829444](TyporaImg/image-20220421171829444.png)
+
+   原理
+
+   ![image-20220421172347083](TyporaImg/image-20220421172347083.png)
+
+   欧拉角
+
+   ![image-20220421172445724](TyporaImg/image-20220421172445724.png)
+
+5. 四元数
+
+   为什么需要四元数？
+
+   ![image-20220421172820342](TyporaImg/image-20220421172820342.png)
+
+   四元数的表示
+
+   ![image-20220421173128643](TyporaImg/image-20220421173128643.png)
+
+   四元数的运算
+
+   ![image-20220421183653278](TyporaImg/image-20220421183653278.png)
+
+   ![image-20220421183830928](TyporaImg/image-20220421183830928.png)
+
+   四元数与三维空间的旋转
+
+   ![image-20220421173258508](TyporaImg/image-20220421173258508.png)
+
+   单位旋转向量与单位四元数
+
+   ![image-20220421173522369](TyporaImg/image-20220421173522369.png)
+
+   ![image-20220421173734076](TyporaImg/image-20220421173734076.png)
+
+   **用四元数表示旋转**
+
+   ![image-20220421184152242](TyporaImg/image-20220421184152242.png)
+
+   ![image-20220421184503439](TyporaImg/image-20220421184503439.png)
+
+   常见的变换
+
+   ![image-20220421184627536](TyporaImg/image-20220421184627536.png)
+
+6. useGeometry
+
+   ```c++
+   // Eigen/Geometry 模块提供了各种旋转和平移的表示
+     // 3D 旋转矩阵直接使用 Matrix3d 或 Matrix3f
+     Matrix3d rotation_matrix = Matrix3d::Identity();
+     // 旋转向量使用 AngleAxis, 它底层不直接是Matrix，但运算可以当作矩阵（因为重载了运算符）
+     AngleAxisd rotation_vector(M_PI / 4, Vector3d(0, 0, 1));     //沿 Z 轴旋转 45 度
+     cout.precision(3);
+     cout << "rotation matrix =\n" << rotation_vector.matrix() << endl;   //用matrix()转换成矩阵
+     // 也可以直接赋值
+     rotation_matrix = rotation_vector.toRotationMatrix();
+     // 用 AngleAxis 可以进行坐标变换
+     Vector3d v(1, 0, 0);
+     Vector3d v_rotated = rotation_vector * v;
+     cout << "(1,0,0) after rotation (by angle axis) = " << v_rotated.transpose() << endl;
+     // 或者用旋转矩阵
+     v_rotated = rotation_matrix * v;
+     cout << "(1,0,0) after rotation (by matrix) = " << v_rotated.transpose() << endl;
+   
+     // 欧拉角: 可以将旋转矩阵直接转换成欧拉角
+     Vector3d euler_angles = rotation_matrix.eulerAngles(2, 1, 0); // ZYX顺序，即yaw-pitch-roll顺序
+     cout << "yaw pitch roll = " << euler_angles.transpose() << endl;
+   
+     // 欧氏变换矩阵使用 Eigen::Isometry
+     Isometry3d T = Isometry3d::Identity();                // 虽然称为3d，实质上是4＊4的矩阵
+     T.rotate(rotation_vector);                                     // 按照rotation_vector进行旋转
+     T.pretranslate(Vector3d(1, 3, 4));                     // 把平移向量设成(1,3,4)
+     cout << "Transform matrix = \n" << T.matrix() << endl;
+   
+     // 用变换矩阵进行坐标变换
+     Vector3d v_transformed = T * v;                              // 相当于R*v+t
+     cout << "v tranformed = " << v_transformed.transpose() << endl;
+   
+     // 对于仿射和射影变换，使用 Eigen::Affine3d 和 Eigen::Projective3d 即可，略
+   
+     // 四元数
+     // 可以直接把AngleAxis赋值给四元数，反之亦然
+     Quaterniond q = Quaterniond(rotation_vector);
+     cout << "quaternion from rotation vector = " << q.coeffs().transpose()
+          << endl;   // 请注意coeffs的顺序是(x,y,z,w),w为实部，前三者为虚部
+     // 也可以把旋转矩阵赋给它
+     q = Quaterniond(rotation_matrix);
+     cout << "quaternion from rotation matrix = " << q.coeffs().transpose() << endl;
+     // 使用四元数旋转一个向量，使用重载的乘法即可
+     v_rotated = q * v; // 注意数学上是qvq^{-1}
+     cout << "(1,0,0) after rotation = " << v_rotated.transpose() << endl;
+     // 用常规向量乘法表示，则应该如下计算
+     cout << "should be equal to " << (q * Quaterniond(0, 1, 0, 0) * q.inverse()).coeffs().transpose() << endl;
+   
+   ```
+
+   旋转相关的数据结构
+
+   ![image-20220421200649434](TyporaImg/image-20220421200649434.png)
+
+7. visualizeGeometry
+
+   工程配置
+
+   ![image-20220421201540714](TyporaImg/image-20220421201540714.png)
+
+   可视化效果
+
+   ![image-20220421201832421](TyporaImg/image-20220421201832421.png)
+
+8. 整个项目的cmake配置
+
+   ![image-20220421201159830](TyporaImg/image-20220421201159830.png)
+##### ch4
+1. 李群李代数
+
+   为什么需要李群、李代数？
+
+   ![image-20220421202619555](TyporaImg/image-20220421202619555.png)
+
+   群
+
+   ![image-20220421202752723](TyporaImg/image-20220421202752723.png)
+
+   李群
+
+   ![image-20220421202924491](TyporaImg/image-20220421202924491.png)
+
+   李代数的引入（反对称矩阵）
+
+   ![image-20220421203619548](TyporaImg/image-20220421203619548.png)
+
+   ![image-20220421205309657](TyporaImg/image-20220421205309657.png)
+
+   ![image-20220421205452895](TyporaImg/image-20220421205452895.png)
+
+  2. 李代数与李群之间的映射
+
+​		   ![image-20220421204808216](TyporaImg/image-20220421204808216.png)
+
+   	李群乘法与李代数加法的关系
+
+​		   ![image-20220421205932878](TyporaImg/image-20220421205932878.png)
+
+3. 李代数求导、扰动模型（左乘）
+
+   为什么需要研究李代数上的求导？
+
+   ![image-20220421210447204](TyporaImg/image-20220421210447204.png)
+
+   ![image-20220421210711919](TyporaImg/image-20220421210711919.png)
+
+   思路一：李代数求导：比较复杂，不实用（旋转矩阵）
+
+   ![image-20220421210941597](TyporaImg/image-20220421210941597.png)
+
+   思路二：扰动模型（旋转矩阵）
+
+   ![image-20220421211205934](TyporaImg/image-20220421211205934.png)
+
+   ![image-20220421211235389](TyporaImg/image-20220421211235389.png)
+
+   思路二：扰动模型（变换矩阵）
+
+   ![image-20220421211538946](TyporaImg/image-20220421211538946.png)
+
+4. useSophus
+   
+   - 第三方库Sophus
+   
+     这是李群的 C++ 实现，通常用于 2d 和 3d 几何问题（即用于计算机视觉或机器人应用程序）。 其中，这个包包括特殊正交群 SO(2) 和 SO(3) 来表示 2d 和 3d 中的旋转，以及特殊的欧几里得群 SE(2) 和 SE(3) 来表示刚体变换（即旋转 和翻译）在 2d 和 3d 中。
+   
+     ```shell
+     # 使用非模板的 Sophus 库(第一版)
+     git clone https://github.com/strasdat/Sophus.git
+     cd Sophus
+     git checkout a621ff
+     # 使用带模版的库（第二版）。需要安装
+     cmake ..
+     make
+     sudo make install
+     sudo ldconfig
+     ```
+   
+   - 安装依赖库fmt
+   
+     ```
+     # 下载并安装fmt
+     git clone https://github.com/fmtlib/fmt.git
+     cmake ..
+     make
+     sudo make install
+     sudo ldc
+     ```
+   
+     
+   
+   cmake配置
+   
+   ![image-20220421214655153](TyporaImg/image-20220421214655153.png)
+   
+   
+
+
 
 #### 剑指Offer
 
@@ -892,4 +1127,3 @@ unordered_map取出value：
 unordered_map<char,int>::itrator it = mmap.find(c);
 int val = it->second;
 ```
-
