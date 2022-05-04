@@ -1,4 +1,4 @@
-#### 目标跟踪
+目标跟踪
 
 目标跟踪研究综述
 
@@ -122,7 +122,7 @@
 
 1. 打开anaconda prompt，输入命令
 
-   ```
+   ```shell
    # 环境名称：pytorchhgx 依赖的python版本：3.6 可以在"Anaconda3\envs\"目录下查看环境文件
    conda create -n pytorchhgx python=3.6
    # 激活环境
@@ -136,13 +136,35 @@
    # 检查pytoch是否安装成功
    python
    import torch
+   exit() #退出python状态
    # 检查pytorch是否可以使用GPU
    torch.cuda.is_available()
    # 查看已有的环境
    conda info --envs
    # 删除创建的虚拟环境
    conda remove -n 环境名 --all
+   # 安装jupyter
+   conda install nb_conda
+   # 启动jupyter
+   jupyter notebook
+   # 运行jupyter代码块
+   "Shift + Enter"
    ```
+
+   问题：启动jupyter没有弹出页面
+
+   ​	cmd
+   ​	jupyter notebook --generate-config # 生成配置文件
+
+   ​	修改配置文件
+
+   ​	![image-20220426220254985](深度学习入门/TyporaImg/image-20220426220254985.png)
+
+   设置jupyter启动路径（从命令行打开jupyter）
+
+   ​	![image-20220426215631462](深度学习入门/TyporaImg/image-20220426215631462.png)
+
+   
 
 2. 查看电脑的显卡是否支持cuda
 
@@ -200,6 +222,8 @@ git reflog
 git log
 # 版本穿梭（通过HEAD指向的版本号，实现向前穿梭、向后穿梭）
 git reset --hard 版本号
+# 克隆版本回滚
+git checkout b6f4ceae
 ```
 
 其他命令
@@ -462,6 +486,14 @@ sudo find / -iname "*opencv*" > /home/mango/Desktop/opencv_find.txt
 /usr/lib/
 # pcl头文件路径
 /usr/include
+
+# 卸载一个库的步骤
+# 1.删除头文件
+sudo rm -r /usr/local/include/sophus
+# 2.删除库文件
+sudo rm -r /usr/local/lib/libsophus*
+# 3.删除库的可执行文件
+sudo rm -r /usr/local/bin/sophus*
 ```
 
 ldconfig：动态链接库管理命令
@@ -768,15 +800,62 @@ y
    ![image-20220419181137306](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220419181137306.png)
    
    1. 打开vscode --> 设置 --> setting.json 
-   在setting.json中添加以下三行代码：
-   "editor.formatOnType": true,
-   "editor.formatOnSave": true,
-   "editor.formatOnPaste": true // 自动格式化粘贴的内容
+       在setting.json中添加以下三行代码：
+       "editor.formatOnType": true,
+       "editor.formatOnSave": true,
+       "editor.formatOnPaste": true // 自动格式化粘贴的内容
    2. 或者，打开vscode --> 设置 --> 搜索"格式化" --> 点击"文本编辑器" --> "正在格式化" --> 勾选里面的三个选项
+   
+4. 如何获取当前程序执行路径
+
+   ```c++
+   #include <unistd.h>
+   #include <stdio.h>
+   
+   int main(int argc, char **argv){
+   
+       char buf[256] = {0};
+   
+       getcwd(buf, sizeof(buf));
+       printf("current working directory : %s\n", buf);
+   
+       return 0;
+   }
+   ```
+
+5. 设置vscode代码注释（函数注释添加）
+
+   在 Vscode 扩展商店中搜索`koroFileHeader`,点击安装即可。
+
+   - 文件头部注释：
+
+     在当前编辑文件中使用快捷键:window`：`ctrl+win+i`,`mac`：`ctrl+cmd+i`, `linux`: `ctrl+win/super+i,即可生成文件头部注释。
+
+   - 函数注释：
+
+     将光标放在函数行或者将光标放在函数上方的空白行
+
+     使用快捷键window`：`ctrl+win+t`,`mac`：`ctrl+cmd+t`,`linux`: `ctrl+win/super+t，即可生成函数注释。
+
+     事实上，函数注释在文件的任意位置都可生成，这里需要自己控制。
+
+     
+
+   - 自定义模板：
+
+     在用户设置中，搜索`fileheader`。
+
+     复制默认配置+修改配置,重启生效。
+
+6. 
 
 #### cmake(黑马程序员make)
 
 Linux默认安装库的位置；头文件的位置
+
+```
+
+```
 
 
 
@@ -784,9 +863,11 @@ Linux默认安装库的位置；头文件的位置
 
 #### SLAM14讲
 
+问题清单：https://chowdera.com/2022/03/202203040557088683.html
+
 ##### ch2
 
-编译环境配置
+编译环境配置（ubuntu20.04+vscode）
 
 ![image-20220420162447539](C:\Users\86153\AppData\Roaming\Typora\typora-user-images\image-20220420162447539.png)
 
@@ -1092,15 +1173,49 @@ cmake调用动态库
      sudo ldconfig
      ```
    
-   - 安装依赖库fmt
+   - Sophus需要依赖eigen3.3以上版本
    
+     ```shell
+     # 查看已安装的eigen版本
+     cat /usr/include/eigen3/Eigen/src/Core/util/Macros.h
+     # 或者
+     cat /usr/local/include/eigen3/Eigen/src/Core/util/Macros.h
      ```
+   
+     
+   
+   - Sophus依赖fmt（版本需要匹配fmt：7）
+   
+     ```shell
      # 下载并安装fmt
      git clone https://github.com/fmtlib/fmt.git
      cmake ..
      make
      sudo make install
-     sudo ldc
+     sudo ldconfig
+     ```
+   
+   - 卸载Sophus库
+   
+     ```shell
+     # 1.删除头文件
+     sudo rm -r /usr/local/include/sophus
+     # 2.删除库文件
+     sudo rm -r /usr/local/lib/libsophus*
+     # 3.删除库的可执行文件
+     sudo rm -r /usr/local/bin/sophus*
+     ```
+   
+     
+   
+   - 安装Sophus库
+   
+     ```shell
+     # 使用带模版的库（第二版）。需要安装
+     cmake ..
+     make
+     sudo make install
+     sudo ldconfig
      ```
    
      
@@ -1109,7 +1224,390 @@ cmake调用动态库
    
    ![image-20220421214655153](TyporaImg/image-20220421214655153.png)
    
+   ![image-20220422190253727](TyporaImg/image-20220422190253727.png)
    
+   编译
+   
+   ```shell
+   # 编译example项目
+   cmake -D USE_UBUNTU_20=ON ..
+   make
+   ```
+
+##### ch5
+
+1. 针孔相机模型
+
+   ![image-20220422195710628](TyporaImg/image-20220422195710628.png)
+
+   内参矩阵
+
+   ![image-20220422200012286](TyporaImg/image-20220422200012286.png)
+
+   ![image-20220422200100445](TyporaImg/image-20220422200100445.png)
+
+   外参矩阵、归一化平面
+
+   ![image-20220422200622141](TyporaImg/image-20220422200622141.png)
+
+2. 畸变
+
+   ![image-20220422201009487](TyporaImg/image-20220422201009487.png)
+
+   畸变模型
+
+   ![image-20220422201140054](TyporaImg/image-20220422201140054.png)
+
+3. 双目相机模型
+
+   背景（单目无法确定深度信息）
+
+   ![image-20220422201302189](TyporaImg/image-20220422201302189.png)
+
+   视差计算原理
+
+   ![image-20220422201521831](TyporaImg/image-20220422201521831.png)
+
+   ![image-20220422201624479](TyporaImg/image-20220422201624479.png)
+
+4. RGB-D相机
+
+   ![image-20220422201728820](TyporaImg/image-20220422201728820.png)
+
+5. 图像的表示
+
+   ![image-20220422201820014](TyporaImg/image-20220422201820014.png)
+
+6. 项目编译
+
+   ![image-20220422202915431](TyporaImg/image-20220422202915431.png)
+
+   问题：无法打开 libc-start.c、raise.c。解决：将opencv4版本删除干净，使用opencv3.4.16版本
+
+   ![image-20220422212839749](TyporaImg/image-20220422212839749.png)
+
+   ```shell
+   # 1.安装glibc
+   sudo apt install glibc-source
+   cd /usr/src/glibc/
+   sudo tar -xvf glibc-[VERSION].tar.xz
+   # 2.在 VSCode 文件夹下的.vscode/launch.json中添加以下内容：（修改 S&xCS9 为报错提示中出现的glibc文件名）
+   "sourceFileMap": {
+         "/build/glibc-S7xCS9": "/usr/src/glibc"
+   }
+   ```
+
+   cv::waitKey()函数详解
+
+   ![image-20220422211053128](TyporaImg/image-20220422211053128.png)
+
+##### ch6
+
+1. 状态估计问题
+
+   ![image-20220423161516774](TyporaImg/image-20220423161516774.png)
+
+   最小二乘问题的迭代求解
+
+   ![image-20220423161817851](TyporaImg/image-20220423161817851.png)
+
+   一阶和二阶梯度法（最速下降法、牛顿法）
+
+   ![image-20220423161919176](TyporaImg/image-20220423161919176.png)
+
+   ![image-20220423162055181](TyporaImg/image-20220423162055181.png)
+
+   更好的两种方法:Gauss-Newton
+
+   ![image-20220423162213652](TyporaImg/image-20220423162213652.png)
+
+   ![image-20220423162303518](TyporaImg/image-20220423162303518.png)
+
+   ![image-20220423162334623](TyporaImg/image-20220423162334623.png)
+
+   更好的两种方法:Levenberg-Marquadt
+
+   ![image-20220423162440585](TyporaImg/image-20220423162440585.png)
+
+   ![image-20220423162454473](TyporaImg/image-20220423162454473.png)
+
+2. 第三方库
+
+   - Ceres
+
+     Ceres Solver 是一个开源 C++ 库，用于建模和解决大型、复杂的优化问题。 它是一个功能丰富、成熟且高性能的库，自 2010 年以来一直在 Google 生产中使用。Ceres Solver 可以解决两种问题：
+
+     ​	1）具有边界约束的非线性最小二乘问题。
+     ​	2）一般无约束优化问题。
+
+     ```shell
+     # 下载
+     git clone https://github.com/ceres-solver/ceres-solver.git
+     
+     # 先安装依赖库
+     # CMake
+     sudo apt-get install cmake
+     # google-glog + gflags
+     sudo apt-get install libgoogle-glog-dev libgflags-dev
+     # Use ATLAS for BLAS & LAPACK
+     sudo apt-get install libatlas-base-dev
+     # Eigen3
+     sudo apt-get install libeigen3-dev
+     # SuiteSparse and CXSparse (optional)
+     sudo apt-get install libsuitesparse-dev
+     # 14讲增加内容
+     sudo apt-get install liblapack-dev libcxsparse3 libgtest-dev
+     
+     tar zxf ceres-solver-2.1.0.tar.gz
+     mkdir ceres-bin
+     cd ceres-bin
+     cmake ../ceres-solver-2.1.0
+     make -j3
+     make test
+     # Optionally install Ceres, it can also be exported using CMake which
+     # allows Ceres to be used without requiring installation, see the documentation
+     # for the EXPORT_BUILD_DIR option for more information.
+     make install
+     ```
+
+     
+
+   - g2o - General Graph Optimization
+
+     g2o是一个开源 C++ 框架，用于优化基于图的非线性误差函数。 g2o被设计成可以轻松扩展到广泛的问题，并且通常可以在几行代码中指定一个新问题。 当前的实现为 SLAM 和 BA 的几种变体提供了解决方案。
+
+     ```shell
+     # 安装依赖库
+     sudo apt-get install qt5-qmake qt5-default libqglviewer-dev-qt5 libsuitesparse-dev libcxsparse3 libcholmod3
+     # 编译安装g2o
+     ```
+
+   
+
+3. 编译
+
+   ![image-20220424102503190](TyporaImg/image-20220424102503190.png)
+
+   ceres求解
+
+   区分：目标函数、核函数、代价函数（代价函数+核函数=>目标函数）；明确参数块（待优化变量）
+
+   ![image-20220424110139345](TyporaImg/image-20220424110139345.png)
+
+   ![image-20220424110252484](TyporaImg/image-20220424110252484.png)
+
+   g2o图优化问题
+
+   ![image-20220424111537101](TyporaImg/image-20220424111537101.png)
+
+   ![image-20220424111839126](TyporaImg/image-20220424111839126.png)
+
+   ![image-20220424112023693](TyporaImg/image-20220424112023693.png)
+
+##### ch7
+
+1. 视觉里程计1（VO前端）：基于特征点
+
+2. 特征点法
+
+   ![image-20220424160407210](TyporaImg/image-20220424160407210.png)
+
+   SIFT(Scale-Invariant Feature Transform)：尺度不变特征变换，考虑了图像变换过程中的光照，尺度，旋转等变化。精度高，速度慢。
+
+   ORB（Oriented FAST and Rotated BRIEF）是目前看来非常具有代表性的实时图像特征。它改进了 FAST 检测子 不具有方向性的问题，并采用速度极快的二进制描述子BRIEF，使整个图像特征提取的环节大大加速。
+
+3. 代码编译
+
+   ![image-20220424162655944](TyporaImg/image-20220424162655944.png)
+
+4. 估计相机运动的方法
+
+   ![image-20220424170958693](TyporaImg/image-20220424170958693.png)
+
+   - 2D-2D：对极几何（p1、p2是像素坐标；x1、x2是两个像素点的归一化平面的坐标）
+
+   - 本质矩阵和单应矩阵都需要经过分解后，才能得到相机的外参信息
+
+     ![image-20220424171251310](TyporaImg/image-20220424171251310.png)
+
+     ![image-20220424171343534](TyporaImg/image-20220424171343534.png)
+
+     ![image-20220424171410285](TyporaImg/image-20220424171410285.png)
+
+     本质矩阵
+
+     ![image-20220424171941580](TyporaImg/image-20220424171941580.png)
+
+     ![image-20220424172117552](TyporaImg/image-20220424172117552.png)
+
+     ![image-20220424172137159](TyporaImg/image-20220424172137159.png)
+
+     单应矩阵
+
+     ![image-20220424172618077](TyporaImg/image-20220424172618077.png)
+
+     ![image-20220424172649095](TyporaImg/image-20220424172649095.png)
+
+     单应矩阵的应用场景
+
+     ![image-20220424172805942](TyporaImg/image-20220424172805942.png)
+
+   - 三角测量
+
+   - 3D-2D：PnP
+
+     ![image-20220424184743160](TyporaImg/image-20220424184743160.png)
+
+     ![image-20220424184953759](TyporaImg/image-20220424184953759.png)
+
+   - BA优化
+
+     ![image-20220424185101207](TyporaImg/image-20220424185101207.png)
+
+   - 3D-3D：ICP（SVD方法；BA优化方法）
+
+##### ch12
+
+1. 单目稠密重建实验
+
+   实验数据下载：http://rpg.ifi.uzh.ch/datasets/remode_test_data.zip
+
+2. 编译设置修改
+
+   dense_mono
+
+   ![image-20220504104917925](深度学习入门/TyporaImg/image-20220504104917925.png)
+
+   dense_RGBD
+
+   ![image-20220504143758221](深度学习入门/TyporaImg/image-20220504143758221.png)
+
+   ![image-20220504150918791](深度学习入门/TyporaImg/image-20220504150918791.png)
+
+2. 
+
+#### 深度学习入门
+
+##### Python入门
+
+1. Python库
+
+   - NumPy
+
+     NumPy 是 Python 中科学计算的基础包。 它是一个 Python 库，提供多维数组对象、各种派生对象（例如掩码数组和矩阵）以及用于对数组进行快速操作的各种例程，包括数学、逻辑、形状操作、排序、选择、I/O 、离散傅里叶变换、基本线性代数、基本统计运算、随机模拟等等。
+
+   - Matplotlib
+
+     Matplotlib 是一个综合库，用于在 Python 中创建静态、动画和交互式可视化。 Matplotlib 让简单的事情变得简单，让困难的事情成为可能。
+
+     ​	创建出版质量图。
+     ​	制作可以缩放、平移、更新的交互式图形。
+     ​	自定义视觉样式和布局。
+     ​	导出为多种文件格式。
+     ​	嵌入 JupyterLab 和图形用户界面。
+     ​	使用基于 Matplotlib 构建的丰富的第三方包。
+
+2. numpy深度学习常用函数及参数理解
+
+   - axis
+
+     <img src="深度学习入门/TyporaImg/image-20220428150350595.png" alt="image-20220428150350595" style="zoom:67%;" />
+
+     ![image-20220428150447698](深度学习入门/TyporaImg/image-20220428150447698.png)
+
+   - keepdims
+
+     ![image-20220428150802266](深度学习入门/TyporaImg/image-20220428150802266.png)
+
+   - shape,dtype,ndim(A)
+
+     ![image-20220428150943274](深度学习入门/TyporaImg/image-20220428150943274.png)
+
+     ndim(A,B)：获取两矩阵乘积
+
+   - argmax(A,axis=x)
+
+     ![image-20220428151321812](深度学习入门/TyporaImg/image-20220428151321812.png)
+
+   - reshape
+
+     ![image-20220428151424522](深度学习入门/TyporaImg/image-20220428151424522.png)
+
+     
+
+   - log()
+
+     ![image-20220428151504634](深度学习入门/TyporaImg/image-20220428151504634.png)
+
+     
+
+   - sum()
+
+     ![image-20220428151533776](深度学习入门/TyporaImg/image-20220428151533776.png)
+
+     
+
+   - arange
+
+     ![image-20220428151618496](深度学习入门/TyporaImg/image-20220428151618496.png)
+
+     
+
+   - rand()和randn()
+
+     ![image-20220428151729605](深度学习入门/TyporaImg/image-20220428151729605.png)
+
+     
+
+   - zeros(),zeros_like()
+
+     ![image-20220428151815810](深度学习入门/TyporaImg/image-20220428151815810.png)
+
+     
+
+   - choice()
+
+     ![image-20220428151920978](深度学习入门/TyporaImg/image-20220428151920978.png)
+
+     
+
+   - concatenate()
+
+     矩阵拼接
+
+     ![image-20220428152124603](深度学习入门/TyporaImg/image-20220428152124603.png)
+
+     
+
+   - shuffle
+
+     ![image-20220428152202770](深度学习入门/TyporaImg/image-20220428152202770.png)
+
+     
+
+   - mean
+
+     ![image-20220428152253163](深度学习入门/TyporaImg/image-20220428152253163.png)
+
+     
+
+   - std
+
+     ![image-20220428152331452](深度学习入门/TyporaImg/image-20220428152331452.png)
+
+     
+
+   - expand_dims
+
+     ![image-20220428152417666](深度学习入门/TyporaImg/image-20220428152417666.png)
+
+   - 
+
+##### 感知机
+
+##### ch4神经网络
+
+
 
 
 
