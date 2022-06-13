@@ -216,6 +216,8 @@ git add 文件名
 git rm --cached hello.txt
 # 将所有文件从暂存区删除
 git rm --cached -r *
+# 删除文件夹及文件夹中的文件
+git rm --cached dir_
 # 将暂存区的文件提交到本地库
 git commit -m "日志信息" 文件名
 # 将所有暂存区文件提交到本地库
